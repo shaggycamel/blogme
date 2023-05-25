@@ -13,7 +13,16 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
+    dplyr,
+    fs,
+    glue,
+    here,
+    htmltools,
+    leaflet,
     mapBliss (>= 0.1.0),
-    purrr
-Remotes:  
+    purrr,
+    readr,
+    stringr,
+    yaml
+Remotes: 
     https://github.com/benyamindsmith/mapBliss.git
