@@ -1,7 +1,18 @@
 
 
 # Create Image YAML -------------------------------------------------------
-
+#' @importFrom readr write_lines
+#' @importFrom fs dir_info
+#' @importFrom purrr map2
+#' @importFrom purrr walk2
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom dplyr arrange
+#' @importFrom stringr str_ends
+#' @importFrom stringr str_remove
+#' @importFrom stringr str_to_title
+#' @importFrom stringr str_replace_all
+#' @importFrom stringr str_glue
 #' @export
 create_image_yaml <- function(media_dir_path){
 
@@ -12,21 +23,20 @@ create_image_yaml <- function(media_dir_path){
   image_dirs <- get_image_dirs(media_dir_path)
 
   # loop through image dirs and create yaml files
-  purrr::walk2(image_dirs$dir, image_dirs$path, ~ {
-  # for(dir in image_dirs$dir){ ##### -- map2 here instead, to obtain path....
+  walk2(image_dirs$dir, image_dirs$path, ~ {
 
     rename_jpg(.y)
 
     # Get names of images in image directories
-    images <- fs::dir_info(paste0(media_dir_path, .x, "/")) |>
-      dplyr::filter(stringr::str_ends(path, ".jpg|.JPG")) |>
-      dplyr::mutate(file_name = stringr::str_remove(path, paste0(media_dir_path, .x, "/")), .after = path) |>
-      dplyr::arrange(birth_time)
+    images <- dir_info(paste0(media_dir_path, .x, "/")) |>
+      filter(str_ends(path, ".jpg|.JPG")) |>
+      mutate(file_name = str_remove(path, paste0(media_dir_path, .x, "/")), .after = path) |>
+      arrange(birth_time)
 
     # Create strings describing images in directories
-    img_ls <- purrr::map2(.x, images$file_name, ~ {
-      t_dir <- stringr::str_to_title(stringr::str_replace_all(.x, "_", " "))
-      stringr::str_glue('
+    img_ls <- map2(.x, images$file_name, ~ {
+      t_dir <- str_to_title(str_replace_all(.x, "_", " "))
+      str_glue('
                         - image: "media_data/{.x}/{.y}"
                           caption: "{t_dir}"
                         \n'
@@ -34,7 +44,7 @@ create_image_yaml <- function(media_dir_path){
     })
 
     # Write description to yaml files
-    readr::write_lines(img_ls, paste0(media_dir_path, .x, "/", .x, ".yml"))
+    write_lines(img_ls, paste0(media_dir_path, .x, "/", .x, ".yml"))
 
   })
 }
@@ -42,6 +52,8 @@ create_image_yaml <- function(media_dir_path){
 
 # Mogrify -----------------------------------------------------------------
 
+#' @importFrom glue glue
+#' @export
 mogrify <- function(media_dir_path){
 
   # Get media directory path
@@ -56,7 +68,7 @@ mogrify <- function(media_dir_path){
     rename_jpg(path)
 
     # Execute mogrify command
-    system(glue::glue("(cd /; mogrify -quality 40 -resize 30% {path}/*.JPG)"))
+    system(glue("(cd /; mogrify -quality 40 -resize 30% {path}/*.JPG)"))
 
   }
   cat("Successful mogrification...")
@@ -66,18 +78,25 @@ mogrify <- function(media_dir_path){
 # Helpers -----------------------------------------------------------------
 
 # Get media_dir_path: append "media_data" to the end of directory path
+#' @importFrom here here
 get_media_dir_path <- function(media_dir_path) {
-  paste0(here::here(), "/", media_dir_path, "/media_data/")
+  paste0(here(), "/", media_dir_path, "/media_data/")
 }
 
 # Get names of directories
+#' @importFrom fs dir_info
+#' @importFrom dplyr mutate
+#' @importFrom stringr str_remove
 get_image_dirs <- function(media_dir_path){
-  fs::dir_info(media_dir_path) |>
-    dplyr::mutate(dir = stringr::str_remove(path, media_dir_path), .after = path)
+  dir_info(media_dir_path) |>
+    mutate(dir = str_remove(path, media_dir_path), .after = path)
 }
 
 # Rename files function: replace "jpg" with "JPG"
+#' @importFrom fs file_move
+#' @importFrom fs dir_ls
+#' @importFrom stringr str_replace
 rename_jpg <- function(path){
-  fs::file_move(fs::dir_ls(path), stringr::str_replace(fs::dir_ls(path), ".jpg", ".JPG"))
+  file_move(dir_ls(path), str_replace(dir_ls(path), ".jpg", ".JPG"))
 }
 

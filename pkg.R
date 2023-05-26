@@ -34,7 +34,7 @@ destinations <- list(
   "Amman" = list(label="Amman", transport="car", label_pos="top")
 )
 
-plot_route(
+blogme::plot_route(
   names(destinations),
   how = purrr::map_chr(destinations, "transport"),
   label_text = purrr::map_chr(destinations, "label"),
@@ -42,4 +42,8 @@ plot_route(
   weight=3,
   colour="blue"
 )
+
+
+##### HOW IS NAMESPACE FILE BUILT??
+## Need to include fucntions with @export in namespace file somehow...
 

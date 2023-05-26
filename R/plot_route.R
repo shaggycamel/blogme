@@ -1,6 +1,9 @@
+#' @importFrom mapBliss plot_hybrid_route_flex
+#' @importFrom leaflet addScaleBar
+#' @export
 plot_route <- function(names, how, label_text, label_position, weight, colour) {
   m <-
-    mapBliss::plot_hybrid_route_flex(
+    plot_hybrid_route_flex(
       addresses = names,
       how = na.omit(how),
       label_text = as.vector(label_text),
@@ -8,7 +11,7 @@ plot_route <- function(names, how, label_text, label_position, weight, colour) {
       weight = weight,
       colour = colour
     ) |>
-    leaflet::addScaleBar(position = "bottomleft")
+    addScaleBar(position = "bottomleft")
 
   m$x$options$zoomControl <- TRUE
   m
