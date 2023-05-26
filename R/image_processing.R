@@ -68,7 +68,7 @@ mogrify <- function(media_dir_path){
     rename_jpg(path)
 
     # Execute mogrify command
-    system(glue("(cd /; mogrify -quality 40 -resize 30% {path}/*.JPG)"))
+    system(glue("(cd /; /opt/homebrew/bin/magick mogrify -quality 40 -resize 30% {path}/*.JPG)"))
 
   }
   cat("Successful mogrification...")
