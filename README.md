@@ -11,7 +11,7 @@ The goal of blogme is to streamline the creation and management of blogs using t
 You can install the development version of blogme like so:
 
 ``` r
-# install.packaages("devtools")
+# install.packages("devtools")
 devtools::install_github("shaggycamel/blogme")
 ```
 
