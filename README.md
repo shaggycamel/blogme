@@ -4,14 +4,15 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of blogme is to ...
+The goal of blogme is to streamline the creation and management of blogs using the Quarto framework.
 
 ## Installation
 
 You can install the development version of blogme like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+# install.packaages("devtools")
+devtools::install_github("shaggycamel/blogme")
 ```
 
 ## Example
