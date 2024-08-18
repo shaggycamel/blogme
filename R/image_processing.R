@@ -53,6 +53,14 @@ create_image_yaml <- function(media_dir_path){
 # Mogrify -----------------------------------------------------------------
 
 #' @importFrom glue glue
+#' @importFrom purrr map
+#' @importFrom purrr list_rbind
+#' @importFrom purrr walk2
+#' @importFrom fs dir_info
+#' @importFrom fs as_fs_bytes
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom stringr str_detect
 #' @export
 mogrify <- function(media_dir_path){
 
@@ -62,15 +70,25 @@ mogrify <- function(media_dir_path){
   # Get names of all directories in media_data dir
   image_dirs <- get_image_dirs(media_dir_path)
 
-  for(path in image_dirs$path){
+  # Get all images
+  images <- map(get_image_dirs$path, \(x) dir_info(x)) |>
+    list_rbind() |>
+    filter(str_detect(path, "(?i)\\.JPG"), size > as_fs_bytes("250Kb")) |>
+    mutate(div_factor = floor(size / as_fs_bytes("100Kb"))) # experiment with this
+
+  # Operate on images
+  walk2(images$path, images$div_factor, \(x, y){
 
     # Replace "jpg" with "JPG"
-    rename_jpg(path)
+    rename_jpg(x)
+    x <- str_replace(x, "\\.jpg", "\\.JPG")
 
     # Execute mogrify command
-    system(glue("(cd /; /opt/homebrew/bin/magick mogrify -quality 40 -resize 30% {path}/*.JPG)"))
+    print(glue("(cd /; /opt/homebrew/bin/magick mogrify -quality {y} -resize 30% {x})"))
+    system(glue("(cd /; /opt/homebrew/bin/magick mogrify -quality {y} -resize 30% {x})"))
 
-  }
+  })
+
   cat("Successful mogrification...")
 }
 
