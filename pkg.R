@@ -47,3 +47,23 @@ blogme::plot_route(
 ##### HOW IS NAMESPACE FILE BUILT??
 ## Need to include fucntions with @export in namespace file somehow...
 
+setwd("~/git/india_blog_24")
+library(dplyr)
+library(stringr)
+
+media_dir_path <- paste0(getwd(), "/posts/delhi-entry/media_data/")
+
+get_image_dirs <- fs::dir_info(media_dir_path) |>
+    mutate(dir = str_remove(path, media_dir_path), .after = path)
+
+x <- purrr::map(get_image_dirs$path, fs::dir_info) |>
+  purrr::list_rbind() |>
+  filter(str_detect(path, ".JPG"), size > as_fs_bytes("250Kb")) |>
+  mutate(div_factor = size / as_fs_bytes("50Kb"))
+
+purrr::walk2(x$path, x$div_factor, \(x, y){
+  print(y)
+  print(y * 2)
+  cat("\n")
+})
+
