@@ -115,6 +115,7 @@ get_image_dirs <- function(media_dir_path){
 #' @importFrom fs file_move
 #' @importFrom fs dir_ls
 #' @importFrom stringr str_replace
+#' @importFrom stringr str_detect
 rename_jpg <- function(path){
   if(str_detect(path, "\\.")){
     file_move(path, str_remove_all(str_replace(path, c(regex("\\.jpe?g", ignore_case=TRUE)), "\\.JPG"), " "))
