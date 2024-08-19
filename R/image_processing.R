@@ -53,6 +53,14 @@ create_image_yaml <- function(media_dir_path){
 # Mogrify -----------------------------------------------------------------
 
 #' @importFrom glue glue
+#' @importFrom purrr map
+#' @importFrom purrr list_rbind
+#' @importFrom purrr walk2
+#' @importFrom fs dir_info
+#' @importFrom fs as_fs_bytes
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom stringr str_detect
 #' @export
 mogrify <- function(media_dir_path){
 
@@ -62,15 +70,26 @@ mogrify <- function(media_dir_path){
   # Get names of all directories in media_data dir
   image_dirs <- get_image_dirs(media_dir_path)
 
-  for(path in image_dirs$path){
+  # Get all images
+  images <- map(image_dirs$path, \(x) dir_info(x)) |>
+    list_rbind() |>
+    filter(str_detect(path, "(?i)\\.jpe?g"), size > as_fs_bytes("250Kb")) |>
+    mutate(div_factor = ceiling((as.numeric(as_fs_bytes("500Mb")) / as.numeric(size)))) |>
+    mutate(div_factor = if_else(div_factor > 100, 95, div_factor))
+    # experiment with div_factor calc
+
+  # Operate on images
+  walk2(images$path, images$div_factor, \(x, y){
 
     # Replace "jpg" with "JPG"
-    rename_jpg(path)
+    rename_jpg(x)
+    x <- str_remove_all(str_replace(x, regex("\\.jpe?g", ignore_case=TRUE), "\\.JPG"), " ")
 
     # Execute mogrify command
-    system(glue("(cd /; /opt/homebrew/bin/magick mogrify -quality 40 -resize 30% {path}/*.JPG)"))
+    system(glue("(cd /; /opt/homebrew/bin/magick mogrify -quality {y} -resize 30% {x})"))
 
-  }
+  })
+
   cat("Successful mogrification...")
 }
 
@@ -97,6 +116,9 @@ get_image_dirs <- function(media_dir_path){
 #' @importFrom fs dir_ls
 #' @importFrom stringr str_replace
 rename_jpg <- function(path){
-  file_move(dir_ls(path), str_replace(dir_ls(path), ".jpg", ".JPG"))
+  if(str_detect(path, "\\.")){
+    file_move(path, str_remove_all(str_replace(path, c(regex("\\.jpe?g", ignore_case=TRUE)), "\\.JPG"), " "))
+  } else {
+    file_move(dir_ls(path), str_remove_all(str_replace(dir_ls(path), regex("\\.jpe?g", ignore_case=TRUE), "\\.JPG"), " "))
+  }
 }
-
