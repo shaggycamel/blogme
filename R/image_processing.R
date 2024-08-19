@@ -71,20 +71,21 @@ mogrify <- function(media_dir_path){
   image_dirs <- get_image_dirs(media_dir_path)
 
   # Get all images
-  images <- map(get_image_dirs$path, \(x) dir_info(x)) |>
+  images <- map(image_dirs$path, \(x) dir_info(x)) |>
     list_rbind() |>
-    filter(str_detect(path, "(?i)\\.JPG"), size > as_fs_bytes("250Kb")) |>
-    mutate(div_factor = floor(size / as_fs_bytes("100Kb"))) # experiment with this
+    filter(str_detect(path, "(?i)\\.jpe?g"), size > as_fs_bytes("250Kb")) |>
+    mutate(div_factor = ceiling((as.numeric(as_fs_bytes("500Mb")) / as.numeric(size)))) |>
+    mutate(div_factor = if_else(div_factor > 100, 95, div_factor))
+    # experiment with div_factor calc
 
   # Operate on images
   walk2(images$path, images$div_factor, \(x, y){
 
     # Replace "jpg" with "JPG"
     rename_jpg(x)
-    x <- str_replace(x, "\\.jpg", "\\.JPG")
+    x <- str_remove_all(str_replace(x, regex("\\.jpe?g", ignore_case=TRUE), "\\.JPG"), " ")
 
     # Execute mogrify command
-    print(glue("(cd /; /opt/homebrew/bin/magick mogrify -quality {y} -resize 30% {x})"))
     system(glue("(cd /; /opt/homebrew/bin/magick mogrify -quality {y} -resize 30% {x})"))
 
   })
@@ -115,6 +116,9 @@ get_image_dirs <- function(media_dir_path){
 #' @importFrom fs dir_ls
 #' @importFrom stringr str_replace
 rename_jpg <- function(path){
-  file_move(dir_ls(path), str_replace(dir_ls(path), ".jpg", ".JPG"))
+  if(str_detect(path, "\\.")){
+    file_move(path, str_remove_all(str_replace(path, c(regex("\\.jpe?g", ignore_case=TRUE)), "\\.JPG"), " "))
+  } else {
+    file_move(dir_ls(path), str_remove_all(str_replace(dir_ls(path), regex("\\.jpe?g", ignore_case=TRUE), "\\.JPG"), " "))
+  }
 }
-
