@@ -54,7 +54,7 @@ create_image_yaml <- function(media_dir_path){
 
 #' @importFrom glue glue
 #' @importFrom purrr map
-#' @importFrom purrr list_rbind
+#' @importFrom dplyr bind_rows
 #' @importFrom purrr walk2
 #' @importFrom fs dir_info
 #' @importFrom fs as_fs_bytes
@@ -72,7 +72,7 @@ mogrify <- function(media_dir_path){
 
   # Get all images
   images <- map(image_dirs$path, \(x) dir_info(x)) |>
-    list_rbind() |>
+    bind_rows() |>
     filter(str_detect(path, "(?i)\\.jpe?g"), size > as_fs_bytes("250Kb")) |>
     mutate(div_factor = ceiling((as.numeric(as_fs_bytes("500Mb")) / as.numeric(size)))) |>
     mutate(div_factor = if_else(div_factor > 100, 95, div_factor))
