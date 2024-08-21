@@ -47,5 +47,3 @@ blogme::plot_route(
 ##### HOW IS NAMESPACE FILE BUILT??
 ## Need to include fucntions with @export in namespace file somehow...
 
-mogrify()
-
