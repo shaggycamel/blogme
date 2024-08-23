@@ -116,8 +116,7 @@ mogrify <- function(media_dir_path, image_type=".JPG"){
 #' @importFrom stringr str_detect
 get_images <- function(media_dir_path, image_type=".JPG"){
 
-  # replace getwd() with here()
-  dirs <- paste0(getwd(), "/", media_dir_path, "/media_data/") |>
+  dirs <- paste0(here(), "/", media_dir_path, "/media_data/") |>
     dir_info()
 
   images <- map(dirs$path, \(x){
