@@ -101,10 +101,7 @@ mogrify <- function(media_dir_path, image_type=".JPG"){
   walk2(images$path, images$resize_factor, \(x, y){
 
     # Execute mogrify command
-    if(str_detect(x, "DSC\\d+.JPG"))
-      system(glue("(cd /; /opt/homebrew/bin/magick {x} -define jpeg:extent=300Kb -resize {y}% {x})"))
-    else
-      system(glue("(cd /; /opt/homebrew/bin/magick {x} -define jpeg:extent=300Kb {x})"))
+    system(glue("(cd /; /opt/homebrew/bin/magick {x} -define jpeg:extent=300Kb -resize 50% {x})"))
   })
 
   cat("Successful mogrification...")
