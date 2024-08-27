@@ -61,12 +61,15 @@ create_image_yaml <- function(media_dir_path, image_type=".JPG"){
 # Mogrify -----------------------------------------------------------------
 #' @importFrom glue glue
 #' @importFrom purrr map
-#' @importFrom dplyr bind_rows
 #' @importFrom purrr walk2
+#' @importFrom purrr list_rbind
 #' @importFrom fs dir_info
 #' @importFrom fs as_fs_bytes
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
+#' @importFrom dplyr bind_rows
+#' @importFrom dplyr left_join
+#' @importFrom dplyr join_by
 #' @importFrom stringr str_detect
 #' @importFrom stringr str_split_1
 #' @importFrom rlang set_names
