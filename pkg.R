@@ -26,5 +26,5 @@ load_all()
 
 
 ##### Build NAMESPACE file with:
-# devtools::document()
+devtools::document()
 

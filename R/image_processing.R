@@ -68,6 +68,7 @@ create_image_yaml <- function(media_dir_path, image_type=".JPG"){
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
 #' @importFrom stringr str_detect
+#' @importFrom rlang set_names
 #' @export
 mogrify <- function(media_dir_path, image_type=".JPG"){
 
